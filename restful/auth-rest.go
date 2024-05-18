@@ -1,4 +1,4 @@
-package main
+package handlers
 
 import (
 	"encoding/json"
@@ -35,7 +35,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }
 
-func handleRegister(w http.ResponseWriter, r *http.Request) {
+func Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -101,5 +101,5 @@ func handleGet(w http.ResponseWriter, r *http.Request) {
 
 func handleHandlers() {
 	http.HandleFunc("/get", handleGet)
-	http.HandleFunc("/register", handleRegister)
+	http.HandleFunc("/register", Register)
 }

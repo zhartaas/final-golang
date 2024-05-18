@@ -2,11 +2,11 @@ package main
 
 import (
 	"finalProjectGolang/auth"
+	handlers "finalProjectGolang/restful"
+	"google.golang.org/grpc"
 	"log"
 	"net"
 	"net/http"
-
-	"google.golang.org/grpc"
 )
 
 func main() {
@@ -27,8 +27,8 @@ func main() {
 
 	// Запуск HTTP сервера
 	http.HandleFunc("/register", handlers.Register)
-	http.HandleFunc("/login", handlers.Login)
-	http.HandleFunc("/validate", handlers.ValidateToken)
+	//http.HandleFunc("/login", handlers.Login)
+	//http.HandleFunc("/validate", handlers.ValidateToken)
 	log.Println("HTTP server listening on port 8000")
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }
