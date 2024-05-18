@@ -1,16 +1,21 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	auth "finalProjectGolang/auth"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
 )
 
 var jwtKey = []byte("100%forProject")
+
+type Server struct {
+	AuthServer auth.AuthServiceServer
+}
 
 type RegisterRequest struct {
 	Fullname string `json:"fullname"`
@@ -24,18 +29,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func main() {
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, World!")
-	}
-
-	http.HandleFunc("/", handler)
-	handleHandlers()
-
-	log.Fatal(http.ListenAndServe(":8000", nil))
-}
-
-func Register(w http.ResponseWriter, r *http.Request) {
+func (s *Server) Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -54,8 +48,13 @@ func Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	_, err = s.AuthServer.Register(context.Background(), &auth.RegisterRequest{Fullname: req.Fullname, Username: req.Username, Password: req.Password})
 	// Здесь должна быть логика для сохранения пользователя в базу данных
 
+	if err != nil {
+		http.Error(w, "Bad reqeust", http.StatusBadRequest)
+		return
+	}
 	// Создайте JWT токен
 	expirationTime := time.Now().Add(24 * time.Hour)
 	claims := &Claims{
@@ -97,9 +96,4 @@ func handleGet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprintf(w, "get", id)
 	//w.Write(jsonResponse)
-}
-
-func handleHandlers() {
-	http.HandleFunc("/get", handleGet)
-	http.HandleFunc("/register", Register)
 }
