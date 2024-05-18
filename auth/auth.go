@@ -2,17 +2,16 @@ package auth
 
 import (
 	"context"
-	"errors"
+	db "finalProjectGolang/database"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"golang.org/x/crypto/bcrypt"
 )
 
 var jwtKey = []byte("my_secret_key")
 
 type server struct {
-	users map[string]string // simple in-memory user store
+	database *db.Database
 }
 
 func (s *server) mustEmbedUnimplementedAuthServiceServer() {
@@ -20,8 +19,8 @@ func (s *server) mustEmbedUnimplementedAuthServiceServer() {
 	panic("implement me")
 }
 
-func NewAuthServiceServer() *server {
-	return &server{users: make(map[string]string)}
+func NewAuthServiceServer(db *db.Database) *server {
+	return &server{database: db}
 }
 
 type Claims struct {
@@ -31,18 +30,14 @@ type Claims struct {
 
 func (s *server) Register(ctx context.Context, req *RegisterRequest) (*RegisterResponse, error) {
 	// Check if user already exists
-	if _, exists := s.users[req.Username]; exists {
-		return nil, errors.New("user already exists")
-	}
+
+	//}
 
 	// Hash the password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
+
+	//}
 
 	// Store user
-	s.users[req.Username] = string(hashedPassword)
 
 	// Generate token
 	expirationTime := time.Now().Add(24 * time.Hour)
@@ -67,16 +62,8 @@ func (s *server) Register(ctx context.Context, req *RegisterRequest) (*RegisterR
 
 func (s *server) Login(ctx context.Context, req *LoginRequest) (*LoginResponse, error) {
 	// Check if user exists
-	hashedPassword, exists := s.users[req.Username]
-	if !exists {
-		return nil, errors.New("invalid username or password")
-	}
 
 	// Compare password
-	err := bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(req.Password))
-	if err != nil {
-		return nil, errors.New("invalid username or password")
-	}
 
 	// Generate token
 	expirationTime := time.Now().Add(24 * time.Hour)
