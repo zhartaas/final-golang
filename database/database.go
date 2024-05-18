@@ -56,7 +56,7 @@ func (db Database) GetUser(id int) (*User, error) {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No rows found for the given ID
-			return &User{}, fmt.Errorf("question with ID %d not found", id)
+			return &User{}, fmt.Errorf("question with ID %d nogi t found", id)
 		}
 		// Other error occurred
 		return &User{}, err
