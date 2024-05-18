@@ -76,15 +76,6 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Ensure the gRPC connection is still open before making a call
-	if grpcConn == nil {
-		if err := connectToGrpc(); err != nil {
-			http.Error(w, "Failed to reconnect to gRPC server", http.StatusInternalServerError)
-			return
-		}
-		defer grpcConn.Close() // Ensure the connection is closed when the request finishes
-	}
-
 	res, err := conn.CreateUser(context.Background(), &pb.RegisterUserRequest{Fullname: req.Fullname, Username: req.Username, Password: req.Password})
 
 	if err != nil {
