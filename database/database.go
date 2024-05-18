@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"context"
@@ -25,38 +25,21 @@ type Database struct {
 	DB *pgxpool.Pool
 }
 
-func (db Database) GetAllUsers() ([]User, error) {
-	query := "SELECT * FROM users"
-	var users []User
+var db *Database
 
-	rows, err := db.DB.Query(context.Background(), query)
-
-	if err != nil {
-		panic(err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var user User
-		err := rows.Scan(&user.UserID, &user.FullName, &user.Username, &user.Password)
-		if err != nil {
-			panic(err)
-		}
-		users = append(users, user)
-	}
-
-	return users, nil
-}
-
-func (db Database) GetUser(id int) (*User, error) {
+func (db Database) GetUser(username string) (*User, error) {
 	var user User
 
 	err := db.DB.QueryRow(context.Background(),
-		"SELECT * FROM users WHERE userID = $1", id).Scan(&user.UserID, &user.FullName, &user.Username, &user.Password)
+		"SELECT * FROM users WHERE username = $1", username).Scan(&user.UserID, &user.FullName, &user.Username, &user.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No rows found for the given ID
+<<<<<<< HEAD
 			return &User{}, fmt.Errorf("question with ID %d nogi t found", id)
+=======
+			return &User{}, fmt.Errorf("question with username %d not found", username)
+>>>>>>> Ilyas
 		}
 		// Other error occurred
 		return &User{}, err
@@ -66,32 +49,42 @@ func (db Database) GetUser(id int) (*User, error) {
 }
 
 func (db Database) CreateUser(fullname, username, password string) error {
+
 	query := "INSERT INTO users (fullname, username, password) VALUES ($1, $2, $3)"
 
 	_, err := db.DB.Exec(context.Background(), query, fullname, username, password)
 
 	if err != nil {
+		fmt.Println(err, 1)
 		panic(err)
 	}
 	return nil
 }
 
-func CreateDatabase() (Database, error) {
-	var db Database
+func (db Database) Close() {
+	db.Close()
+}
+
+func CreateDatabase() (*Database, error) {
+	if db != nil {
+		return db, nil
+	}
 	DSN := fmt.Sprintf("postgres://%s:%s@%s:%d/%s", username, password, hostname, port, dbname)
 	DB, err := pgxpool.Connect(context.Background(), DSN)
 
 	if err != nil {
+
 		panic(err)
 	}
 
 	if err := DB.Ping(context.Background()); err != nil {
-		fmt.Println(err)
-		return
+		//fmt.Println(err)
+		return &Database{}, err
 	}
-	defer DB.Close()
-	db.DB = DB
+	db = &Database{DB: DB}
 	fmt.Println("Successfully connected to postgres")
 
-	return db
+	return db, nil
 }
+
+//
