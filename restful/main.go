@@ -18,7 +18,7 @@ type RegisterRequest struct {
 	Password string `json:"password"`
 }
 
-// Claims структура для JWT токена
+// структура для JWT токена
 type Claims struct {
 	Username string `json:"username"`
 	jwt.StandardClaims
