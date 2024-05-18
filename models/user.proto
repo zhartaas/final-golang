@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+option go_package = "github.com/protocolbuffers/protobuf/examples/go/tutorialpb";
+
+package user;
+
+service UserService {
+  rpc CreateUser(RegisterUserRequest) returns (RegisterUserResponse) {}
+  rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {}
+  rpc GetUser(GetUserRequest) returns (User) {}
+}
+
+message User {
+  int64 id = 1;
+  string fullname = 2;
+  string username = 3;
+  string password = 4;
+}
+
+message GetUserRequest {
+  string id = 1;
+}
+
+message RegisterUserRequest {
+  string fullname = 1;
+  string username = 2;
+  string password = 3;
+}
+
+message RegisterUserResponse {
+  string message = 1;
+}
+
+message LoginUserRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message LoginUserResponse {
+  string token = 1;
+}

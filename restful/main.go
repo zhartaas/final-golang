@@ -1,11 +1,17 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
+	pb "finalProjectGolang/models"
+	"flag"
 	"fmt"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type RegisterRequest struct {
@@ -14,15 +20,41 @@ type RegisterRequest struct {
 	Password string `json:"password"`
 }
 
-func main() {
-	handler := func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello, World!")
-	}
+var grpcaddr = flag.String("addr", "localhost:50051", "the address to connect to")
+var conn pb.UserServiceClient
+var grpcConn *grpc.ClientConn
 
-	http.HandleFunc("/", handler)
+func main() {
+	flag.Parse()
+
+	// Establish the gRPC connection
+	if err := connectToGrpc(); err != nil {
+		log.Fatalf("failed to connect to gRPC server: %v", err)
+	}
+	defer grpcConn.Close() // Ensure the connection is closed when the application exits
+
+	// Define HTTP handlers
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello, World!")
+	})
 	handleHandlers()
 
+	// Start the HTTP server
 	log.Fatal(http.ListenAndServe(":8000", nil))
+}
+
+func connectToGrpc() error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	var err error
+	grpcConn, err = grpc.DialContext(ctx, *grpcaddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return fmt.Errorf("failed to dial gRPC server: %v", err)
+	}
+
+	conn = pb.NewUserServiceClient(grpcConn)
+	return nil
 }
 
 func handleRegister(w http.ResponseWriter, r *http.Request) {
@@ -44,10 +76,25 @@ func handleRegister(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Ensure the gRPC connection is still open before making a call
+	if grpcConn == nil {
+		if err := connectToGrpc(); err != nil {
+			http.Error(w, "Failed to reconnect to gRPC server", http.StatusInternalServerError)
+			return
+		}
+		defer grpcConn.Close() // Ensure the connection is closed when the request finishes
+	}
+
+	res, err := conn.CreateUser(context.Background(), &pb.RegisterUserRequest{Fullname: req.Fullname, Username: req.Username, Password: req.Password})
+
+	if err != nil {
+		fmt.Println(err)
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	response := map[string]string{"message": "User registered successfully"}
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(res.Message)
 
 }
 

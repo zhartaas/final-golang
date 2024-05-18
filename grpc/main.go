@@ -12,13 +12,18 @@ import (
 )
 
 var port = flag.Int("port", 50051, "Server port")
-var DB db.Database
+var DB *db.Database
 
 type server struct {
 	pb.UnimplementedUserServiceServer
 }
 
 func main() {
+	db, err := db.CreateDatabase()
+	if err != nil {
+		log.Fatal(err)
+	}
+	DB = db
 	flag.Parse()
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
@@ -30,9 +35,10 @@ func main() {
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+
 }
 
-func (s *server) RegisterUser(ctx context.Context, in *pb.RegisterUserRequest) (*pb.RegisterUserResponse, error) {
+func (s *server) CreateUser(ctx context.Context, in *pb.RegisterUserRequest) (*pb.RegisterUserResponse, error) {
 	err := DB.CreateUser(in.Fullname, in.Username, in.Password)
 	if err != nil {
 		return nil, err

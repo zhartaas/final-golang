@@ -1,4 +1,4 @@
-package main
+package database
 
 import (
 	"context"
@@ -71,13 +71,13 @@ func (db Database) CreateUser(fullname, username, password string) error {
 	_, err := db.DB.Exec(context.Background(), query, fullname, username, password)
 
 	if err != nil {
-		panic(err)
+		return err
 	}
 	return nil
 }
 
-func CreateDatabase() (Database, error) {
-	var db Database
+func CreateDatabase() (*Database, error) {
+	db := &Database{}
 	DSN := fmt.Sprintf("postgres://%s:%s@%s:%d/%s", username, password, hostname, port, dbname)
 	DB, err := pgxpool.Connect(context.Background(), DSN)
 
@@ -87,11 +87,11 @@ func CreateDatabase() (Database, error) {
 
 	if err := DB.Ping(context.Background()); err != nil {
 		fmt.Println(err)
-		return
+		return &Database{}, err
 	}
 	defer DB.Close()
 	db.DB = DB
 	fmt.Println("Successfully connected to postgres")
 
-	return db
+	return db, nil
 }
