@@ -15,6 +15,11 @@ type server struct {
 	users map[string]string // simple in-memory user store
 }
 
+func (s *server) mustEmbedUnimplementedAuthServiceServer() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func NewAuthServiceServer() *server {
 	return &server{users: make(map[string]string)}
 }
