@@ -38,7 +38,7 @@ func main() {
 
 	// Запуск HTTP сервера
 	http.HandleFunc("/register", srv.Register)
-	//http.HandleFunc("/login", srv.LoginHandler)
+	http.HandleFunc("/login", srv.Login)
 	//http.HandleFunc("/validate", srv.ValidateTokenHandler)
 	log.Println("HTTP server listening on port 8000")
 	log.Fatal(http.ListenAndServe(":8000", nil))

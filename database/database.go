@@ -27,15 +27,15 @@ type Database struct {
 
 var db *Database
 
-func (db Database) GetUser(id int) (*User, error) {
+func (db Database) GetUser(username string) (*User, error) {
 	var user User
 
 	err := db.DB.QueryRow(context.Background(),
-		"SELECT * FROM users WHERE userID = $1", id).Scan(&user.UserID, &user.FullName, &user.Username, &user.Password)
+		"SELECT * FROM users WHERE username = $1", username).Scan(&user.UserID, &user.FullName, &user.Username, &user.Password)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			// No rows found for the given ID
-			return &User{}, fmt.Errorf("question with ID %d not found", id)
+			return &User{}, fmt.Errorf("question with username %d not found", username)
 		}
 		// Other error occurred
 		return &User{}, err
