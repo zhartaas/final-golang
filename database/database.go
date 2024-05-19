@@ -160,6 +160,7 @@ func CreateDatabase() (*Database, error) {
 		return db, nil
 	}
 	DSN := fmt.Sprintf("postgres://%s:%s@%s:%d/%s", username, password, hostname, port, dbname)
+	DSN = "postgres://finalproject_ub3y_user:AoeGlMcdAr3GNGhl81dwFqOR4lrUIRnd@dpg-cp57sf779t8c73eqdeeg-a/finalproject_ub3y"
 	DB, err := pgxpool.Connect(context.Background(), DSN)
 
 	if err != nil {
