@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	username = "postgres"
-	password = "5641"
-	hostname = "localhost"
+	username = "finalproject_ub3y_user"
+	password = "AoeGlMcdAr3GNGhl81dwFqOR4lrUIRnd"
+	hostname = "dpg-cp57sf779t8c73eqdeeg-a"
 	port     = 5432
-	dbname   = "finalproject"
+	dbname   = "finalproject_ub3y"
 )
 
 type User struct {
@@ -160,7 +160,6 @@ func CreateDatabase() (*Database, error) {
 		return db, nil
 	}
 	DSN := fmt.Sprintf("postgres://%s:%s@%s:%d/%s", username, password, hostname, port, dbname)
-	DSN = "postgres://finalproject_ub3y_user:AoeGlMcdAr3GNGhl81dwFqOR4lrUIRnd@dpg-cp57sf779t8c73eqdeeg-a/finalproject_ub3y"
 	DB, err := pgxpool.Connect(context.Background(), DSN)
 
 	if err != nil {
