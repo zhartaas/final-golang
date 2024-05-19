@@ -2,7 +2,7 @@ package main
 
 import (
 	"finalProjectGolang/auth"
-	handlers "finalProjectGolang/restful"
+	handlers "finalProjectGolang/handlers"
 	"google.golang.org/grpc"
 	"log"
 	"net"
