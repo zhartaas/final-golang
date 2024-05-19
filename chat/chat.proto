@@ -4,28 +4,21 @@ package chat;
 
 option go_package = "/";
 
-
-service ChatService {
-  // SendMessage - отправка одного сообщения
-  rpc SendMessage (Message) returns (SendResponse);
-
-  // ReceiveMessages - получение потока сообщений
-  rpc ReceiveMessages (ReceiveRequest) returns (stream Message);
-}
-
-// Message - структура сообщения
 message Message {
   string sender = 1;
   string text = 2;
-  int64 timestamp = 3;
+  string receiver = 3;  // Add this line for the receiver field
 }
 
-// SendResponse - ответ на отправку сообщения
 message SendResponse {
   string status = 1;
 }
 
-// ReceiveRequest - запрос на получение сообщений
 message ReceiveRequest {
   string receiver = 1;
+}
+
+service ChatService {
+  rpc SendMessage (Message) returns (SendResponse);
+  rpc ReceiveMessages (ReceiveRequest) returns (stream Message);
 }

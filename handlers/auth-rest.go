@@ -10,7 +10,7 @@ import (
 
 var jwtKey = []byte("100%forProject")
 
-type Server struct {
+type AuthServer struct {
 	AuthServer auth.AuthServiceServer
 }
 
@@ -31,7 +31,7 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
-func (s *Server) Login(w http.ResponseWriter, r *http.Request) {
+func (s *AuthServer) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -59,7 +59,7 @@ func (s *Server) Login(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (s *Server) Register(w http.ResponseWriter, r *http.Request) {
+func (s *AuthServer) Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
