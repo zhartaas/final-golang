@@ -33,6 +33,16 @@ type SendMessageRequest struct {
 	Text     string `json:"text"`
 }
 
+// @Summary Send a message
+// @Description Send a message to a chat
+// @Tags Chat
+// @Accept  json
+// @Produce  json
+// @Param   message  body  string  true  "Message"
+// @Param   chat_id  body  string  true  "Chat ID"
+// @Success 200 {string} string "ok"
+// @Failure 400 {object} string "error"
+// @Router /sendmessage [post]
 func (s *ChatServer) SendMessage(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost { // Change to http.MethodPost
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -87,6 +97,15 @@ func (s *ChatServer) SendMessage(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+// @Summary Get chat by ID
+// @Description Get messages from a chat by chat ID
+// @Tags Chat
+// @Accept  json
+// @Produce  json
+// @Param   chat_id  body  string  true  "Chat ID"
+// @Success 200 {array} string "messages"
+// @Failure 400 {object} string "error"
+// @Router /getchat [post]
 func (s *ChatServer) GetChatByID(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)

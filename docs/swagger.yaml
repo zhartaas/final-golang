@@ -1,0 +1,142 @@
+basePath: /
+definitions:
+  handlers.LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is the API documentation for the Final Project Golang server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Final Project Golang API
+  version: "1.0"
+paths:
+  /getchat:
+    post:
+      consumes:
+      - application/json
+      description: Get messages from a chat by chat ID
+      parameters:
+      - description: Chat ID
+        in: body
+        name: chat_id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: messages
+          schema:
+            items:
+              type: string
+            type: array
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: Get chat by ID
+      tags:
+      - Chat
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Login a user with username and password
+      parameters:
+      - description: Username and Password
+        in: body
+        name: username
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: Login a user
+      tags:
+      - Auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user with a username and password
+      parameters:
+      - description: Username
+        in: body
+        name: username
+        required: true
+        schema:
+          type: string
+      - description: Password
+        in: body
+        name: password
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: Register a new user
+      tags:
+      - Auth
+  /sendmessage:
+    post:
+      consumes:
+      - application/json
+      description: Send a message to a chat
+      parameters:
+      - description: Message
+        in: body
+        name: message
+        required: true
+        schema:
+          type: string
+      - description: Chat ID
+        in: body
+        name: chat_id
+        required: true
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: Send a message
+      tags:
+      - Chat
+swagger: "2.0"

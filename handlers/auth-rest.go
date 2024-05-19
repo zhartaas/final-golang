@@ -32,6 +32,15 @@ type Claims struct {
 	jwt.StandardClaims
 }
 
+// @Summary Login a user
+// @Description Login a user with username and password
+// @Tags Auth
+// @Accept  json
+// @Produce  json
+// @Param   username  body  LoginRequest  true  "Username and Password"
+// @Success 200 {string} string "ok"
+// @Failure 400 {object} string "error"
+// @Router /login [post]
 func (s *AuthServer) Login(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -61,6 +70,16 @@ func (s *AuthServer) Login(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// @Summary Register a new user
+// @Description Register a new user with a username and password
+// @Tags Auth
+// @Accept  json
+// @Produce  json
+// @Param   username  body  string  true  "Username"
+// @Param   password  body  string  true  "Password"
+// @Success 200 {string} string "ok"
+// @Failure 400 {object} string "error"
+// @Router /register [post]
 func (s *AuthServer) Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
