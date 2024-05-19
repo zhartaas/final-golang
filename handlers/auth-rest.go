@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	auth "finalProjectGolang/auth"
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"net/http"
 )
@@ -11,7 +12,7 @@ import (
 var jwtKey = []byte("100%forProject")
 
 type AuthServer struct {
-	AuthServer auth.AuthServiceServer
+	AuthServer auth.AuthServiceClient
 }
 
 type RegisterRequest struct {
@@ -48,6 +49,7 @@ func (s *AuthServer) Login(w http.ResponseWriter, r *http.Request) {
 	res, err := s.AuthServer.Login(context.Background(), &auth.LoginRequest{Username: req.Username, Password: req.Password})
 
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
@@ -79,6 +81,7 @@ func (s *AuthServer) Register(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Здесь должна быть логика для сохранения пользователя в базу данных
+
 	res, err := s.AuthServer.Register(context.Background(), &auth.RegisterRequest{Fullname: req.Fullname, Username: req.Username, Password: req.Password})
 
 	if err != nil {

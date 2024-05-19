@@ -12,7 +12,7 @@ import (
 )
 
 type ChatServer struct {
-	ChatServer chat.ChatServiceServer
+	ChatServer chat.ChatServiceClient
 }
 
 type ChatMessageJSON struct {
