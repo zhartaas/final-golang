@@ -159,13 +159,13 @@ func CreateDatabase() (*Database, error) {
 	if db != nil {
 		return db, nil
 	}
-	DSN := fmt.Sprintf("postgres://%s:%s@%s:%d/%s", username, password, hostname, port, dbname)
-	DSN = "postgres://finalproject_ub3y_user:AoeGlMcdAr3GNGhl81dwFqOR4lrUIRnd@dpg-cp57sf779t8c73eqdeeg-a/finalproject_ub3y"
-	
-	DB, err := pgxpool.Connect(context.Background(), DSN)
+	//DSN := fmt.Sprintf("postgres://%s:%s@%s:%d/%s", username, password, hostname, port, dbname)
+	//DSN = "postgres://finalproject_ub3y_user:AoeGlMcdAr3GNGhl81dwFqOR4lrUIRnd@dpg-cp57sf779t8c73eqdeeg-a/finalproject_ub3y"
+
+	DB, err := pgxpool.Connect(context.Background(), "postgres://finalproject_ub3y_user:AoeGlMcdAr3GNGhl81dwFqOR4lrUIRnd@dpg-cp57sf779t8c73eqdeeg-a/finalproject_ub3y")
 
 	if err != nil {
-
+		fmt.Println(err)
 		panic(err)
 	}
 
