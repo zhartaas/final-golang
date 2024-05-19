@@ -50,6 +50,7 @@ func main() {
 	http.HandleFunc("/register", srv.Register)
 	http.HandleFunc("/login", srv.Login)
 	http.HandleFunc("/sendmessage", srv.SendMessage)
+	http.HandleFunc("/getchat", srv.GetChatByID)
 	log.Println("HTTP server listening on port 8000")
 	log.Fatal(http.ListenAndServe(":8000", nil))
 }

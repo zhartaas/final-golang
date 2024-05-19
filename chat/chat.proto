@@ -10,15 +10,30 @@ message Message {
   string receiver = 3;  // Add this line for the receiver field
 }
 
+message ChatMessages {
+  int64 messageID = 1;
+  string sender = 2;
+  string text = 3;
+}
+
 message SendResponse {
   string status = 1;
 }
 
-message ReceiveRequest {
-  string receiver = 1;
+message GetChatRequest {
+  string username = 1;
+  int64 chatid = 2;
 }
 
+message Chat {
+  int64 chatid = 1;
+  string username1 = 2;
+  string username2 = 3;
+  repeated ChatMessages messages = 4;
+}
+
+
 service ChatService {
+  rpc GetChatByID(GetChatRequest) returns (Chat);
   rpc SendMessage (Message) returns (SendResponse);
-  rpc ReceiveMessages (ReceiveRequest) returns (stream Message);
 }

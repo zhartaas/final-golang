@@ -7,11 +7,25 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
 type ChatServer struct {
 	ChatServer chat.ChatServiceServer
+}
+
+type ChatMessageJSON struct {
+	MessageID int64  `json:"message_id"`
+	Sender    string `json:"sender"`
+	Text      string `json:"text"`
+}
+
+type ChatJSON struct {
+	ChatID    int64             `json:"chat_id"`
+	Username1 string            `json:"username1"`
+	Username2 string            `json:"username2"`
+	Messages  []ChatMessageJSON `json:"messages"`
 }
 
 type SendMessageRequest struct {
@@ -73,18 +87,19 @@ func (s *ChatServer) SendMessage(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func (s *ChatServer) GetByID(w http.ResponseWriter, r *http.Request) {
+func (s *ChatServer) GetChatByID(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
 	// Extract ID from the URL query parameters
-	id := r.URL.Query().Get("id")
-	if id == "" {
+	idFromUrl := r.URL.Query().Get("id")
+	if idFromUrl == "" {
 		http.Error(w, "Missing ID", http.StatusBadRequest)
 		return
 	}
+	id, _ := strconv.Atoi(idFromUrl)
 
 	// Extract the Bearer token from the Authorization header
 	authHeader := r.Header.Get("Authorization")
@@ -102,30 +117,53 @@ func (s *ChatServer) GetByID(w http.ResponseWriter, r *http.Request) {
 
 	// Parse and validate the JWT token
 	claims := &Claims{}
-	token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+	_, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
 
-	if err != nil {
-		http.Error(w, "Invalid token", http.StatusUnauthorized)
-		return
-	}
+	fmt.Println(claims)
 
-	if !token.Valid {
-		http.Error(w, "Invalid token", http.StatusUnauthorized)
-		return
-	}
+	//if err != nil {
+	//	http.Error(w, "Invalid token", http.StatusUnauthorized)
+	//	return
+	//}
+
+	//if !token.Valid {
+	//	http.Error(w, "Invalid token", http.StatusUnauthorized)
+	//	return
+	//}
+
+	res, err := s.ChatServer.GetChatByID(context.Background(), &chat.GetChatRequest{
+		Username: claims.Username,
+		Chatid:   int64(id),
+	})
 
 	// Here you would include your logic to get the resource by ID
 	// For example, if you had a method `GetResourceByID` on `AuthServer`:
 	//res, err := s.ChatServer.GetResourceByID(context.Background(), &auth.GetResourceByIDRequest{Id: id})
 	if err != nil {
-		http.Error(w, "Resource not found", http.StatusNotFound)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 
-	// Return the resource in the response
-	w.Header().Set("Content-Type", "application/json")
+	messages := make([]ChatMessageJSON, 0, len(res.Messages))
+	for _, message := range res.Messages {
+		messages = append(messages, ChatMessageJSON{
+			MessageID: message.MessageID,
+			Sender:    message.Sender,
+			Text:      message.Text,
+		})
+	}
+
+	// Create the ChatJSON response
+	chatResponse := ChatJSON{
+		ChatID:    res.Chatid,
+		Username1: res.Username1,
+		Username2: res.Username2,
+		Messages:  messages,
+	}
+
+	// Encode and write the response
 	w.WriteHeader(http.StatusOK)
-	//json.NewEncoder(w).Encode(res)
+	json.NewEncoder(w).Encode(chatResponse)
 }

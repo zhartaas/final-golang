@@ -23,13 +23,20 @@ type User struct {
 }
 
 type Chat struct {
-	chatID    int64
-	username1 string
-	username2 string
+	ChatID    int64
+	Username1 string
+	Username2 string
 }
 
 type Database struct {
 	DB *pgxpool.Pool
+}
+
+type Message struct {
+	MessageID int64
+	Sender    string
+	Text      string
+	chatID    int64
 }
 
 var db *Database
@@ -46,6 +53,45 @@ func (db Database) SendMessage(username, text string, chatID int64) (int64, erro
 	}
 
 	return messageID, nil
+}
+
+func (db Database) GetMessages(chatID int64) ([]*Message, error) {
+	messages := make([]*Message, 0)
+
+	query := "SELECT * FROM message WHERE chatID = $1"
+
+	rows, err := db.DB.Query(context.Background(), query, chatID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		message := &Message{}
+		err := rows.Scan(&message.MessageID, &message.Sender, &message.Text, &message.chatID)
+		if err != nil {
+			return nil, err
+		}
+		messages = append(messages, message)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return messages, nil
+}
+
+func (db Database) GetChatByID(id int64) (*Chat, error) {
+	var chat Chat
+
+	query := "SELECT * FROM chat WHERE chatID = $1"
+
+	err := db.DB.QueryRow(context.Background(), query, id).Scan(&chat.ChatID, &chat.Username1, &chat.Username2)
+
+	if err != nil {
+		return &Chat{}, err
+	}
+	return &chat, nil
 }
 
 func (db Database) GetUser(username string) (*User, error) {
@@ -70,13 +116,13 @@ func (db Database) GetChat(username1, username2 string) (int64, error) {
 
 	var chat Chat
 	err := db.DB.QueryRow(context.Background(),
-		query, username1, username2, username1, username2).Scan(&chat.chatID, &chat.username1, &chat.username2)
+		query, username1, username2, username1, username2).Scan(&chat.ChatID, &chat.Username1, &chat.Username2)
 
 	if err != nil {
 		return 0, err
 	}
 
-	return chat.chatID, nil
+	return chat.ChatID, nil
 }
 
 func (db Database) CreateChat(username1, username2 string) (int64, error) {
