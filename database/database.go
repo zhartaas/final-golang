@@ -8,11 +8,11 @@ import (
 )
 
 const (
-	username = "finalproject_ub3y_user"
-	password = "AoeGlMcdAr3GNGhl81dwFqOR4lrUIRnd"
-	hostname = "dpg-cp57sf779t8c73eqdeeg-a"
+	username = "postgres"
+	password = "9999"
+	hostname = "localhost"
 	port     = 5432
-	dbname   = "finalproject_ub3y"
+	dbname   = "postgres"
 )
 
 type User struct {
@@ -162,7 +162,7 @@ func CreateDatabase() (*Database, error) {
 	//DSN := fmt.Sprintf("postgres://%s:%s@%s:%d/%s", username, password, hostname, port, dbname)
 	//DSN = "postgres://finalproject_ub3y_user:AoeGlMcdAr3GNGhl81dwFqOR4lrUIRnd@dpg-cp57sf779t8c73eqdeeg-a/finalproject_ub3y"
 
-	DB, err := pgxpool.Connect(context.Background(), "postgres://finalproject_ub3y_user:AoeGlMcdAr3GNGhl81dwFqOR4lrUIRnd@dpg-cp57sf779t8c73eqdeeg-a/finalproject_ub3y")
+	DB, err := pgxpool.Connect(context.Background(), "postgres://postgres:9999@localhost:5432/postgres")
 
 	if err != nil {
 		fmt.Println(err)
@@ -179,4 +179,15 @@ func CreateDatabase() (*Database, error) {
 	return db, nil
 }
 
-//
+func (db Database) GetProfile(id int64) (*User, error) {
+	var user User
+
+	query := "SELECT * FROM user WHERE UserID = $1"
+
+	err := db.DB.QueryRow(context.Background(), query, id).Scan(&user, &user.FullName, &user.Username)
+
+	if err != nil {
+		return &User{}, err
+	}
+	return &User{}, nil
+}

@@ -7,6 +7,8 @@ import (
 	pb2 "finalProjectGolang/chat"
 	_ "finalProjectGolang/docs"
 	handlers "finalProjectGolang/handlers"
+	"finalProjectGolang/user"
+	pb3 "finalProjectGolang/user"
 	"flag"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"google.golang.org/grpc"
@@ -20,6 +22,7 @@ import (
 type servers struct {
 	*handlers.AuthServer
 	*handlers.ChatServer
+	*handlers.UserServer
 }
 
 var (
@@ -52,6 +55,7 @@ func main() {
 		s := grpc.NewServer()
 		auth.RegisterAuthServiceServer(s, auth.NewAuthServiceServer())
 		chat.RegisterChatServiceServer(s, chat.NewChatServiceServer())
+		user.RegisterUserServiceServer(s, user.NewChatServiceServer())
 		log.Println("gRPC server listening on port 50051")
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("failed to serve: %v", err)
@@ -69,18 +73,21 @@ func main() {
 
 	authClient := pb1.NewAuthServiceClient(conn)
 	chatClient := pb2.NewChatServiceClient(conn)
+	userClient := pb3.NewUserServiceClient(conn)
 	if authClient == nil || chatClient == nil {
 		panic("authserviceserver error")
 	}
 	srv := &servers{
 		&handlers.AuthServer{AuthServer: authClient},
 		&handlers.ChatServer{ChatServer: chatClient},
+		&handlers.UserServer{UserServer: userClient},
 	}
 
 	http.HandleFunc("/register", srv.Register)
 	http.HandleFunc("/login", srv.Login)
 	http.HandleFunc("/sendmessage", srv.SendMessage)
 	http.HandleFunc("/getchat", srv.GetChatByID)
+	http.HandleFunc("/profile", srv.GetProfile)
 
 	// Swagger UI
 	http.HandleFunc("/swagger/", httpSwagger.WrapHandler)

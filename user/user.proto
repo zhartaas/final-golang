@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package user;
+option go_package = "/user";
+
+// UserService defines the gRPC service for user operations
+service UserService {
+  rpc GetProfile (ProfileRequest) returns (ProfileResponse);
+}
+
+// ProfileRequest is the request message for the GetProfile method
+message ProfileRequest {
+  int64 id = 1;
+}
+
+// ProfileResponse is the response message for the GetProfile method
+message ProfileResponse {
+  string full_name = 1;
+  string username = 2;
+}
